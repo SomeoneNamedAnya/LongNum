@@ -236,19 +236,46 @@ class LongNum {
             t_ans = Sum(first, second);
             t_ans.setSign(-1);
         } else if (first.sign_ == -1 && second.sign_ == 1) {
-            t_ans = Dif(second, first);
+            LongNum temp = first;
+            temp.setSign(1);
+            if (temp < second) {
+                t_ans = Dif(second, first);
+            } else {
+                t_ans = Dif(first, second);
+                t_ans.changeSign(-1);
+            }
 
         } else {
-            t_ans = Dif(first, second);
+            LongNum temp = second;
+            temp.setSign(1);
+            if (first < temp) {
+                t_ans = Dif(second, first);
+                t_ans.changeSign(-1);
+            } else {
+                t_ans = Dif(first, second);
+            }
         }
         return t_ans;
     };
+
     friend LongNum operator-(const LongNum first, const LongNum second) {
         LongNum t_ans;
         if (first.sign_ == 1 && second.sign_ == 1) {
-            t_ans = Dif(first, second);
+            if (first > second) {
+                t_ans = Dif(first, second);
+            } else {
+                t_ans = Dif(second, first);
+                t_ans.changeSign(-1);
+            }
+
         } else if (first.sign_ == -1 && second.sign_ == -1) {
-            t_ans = Dif(second, first);
+            if (second > first) {
+                t_ans = Dif(second, first);
+            } else {
+                t_ans = Dif(first, second);
+                t_ans.changeSign(-1);
+            }
+
         } else if (first.sign_ == -1 && second.sign_ == 1) {
             t_ans = Sum(first, second);
             t_ans.setSign(-1);
@@ -259,7 +286,6 @@ class LongNum {
         return t_ans;
 
     }
-
     friend LongNum operator*(const LongNum first, const LongNum second) {
 
         std::vector<int> ans(first.long_num_.size() + second.long_num_.size());
