@@ -441,6 +441,11 @@ class LongNum {
     }
     friend bool operator<(const LongNum first, const LongNum second) {
         if (first == second) return false;
+        if (first.sign_ < second.sign_) {
+            return true;
+        } else if (first.sign_ > second.sign_) {
+            return false;
+        }
         if (first.long_num_.size() - first.fract_length_ > second.long_num_.size() - second.fract_length_) {
             return false;
         }
