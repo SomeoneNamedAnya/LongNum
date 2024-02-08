@@ -3,131 +3,150 @@
 #include<vector>
 #include<algorithm>
 
-std::string to_string(std::vector<int> vec, int len){
-    std::string str;
-    for (int i = vec.size() - 1; i >=0; i--) {
-        if (len == i + 1) {
-            str.push_back('.');
-        }
-        str.push_back('0' + vec[i]);
 
-    }
-    return str;
-}
-
-std::vector<int> to_vector(std::string vec){
-    std::vector<int> str;
-
-    int last_ind = 0;
-    if (vec[0] == '-') {
-        last_ind = 1;
-    }
-
-    for (int i = vec.size() - 1; i >= last_ind; i--) {
-        if (vec[i] =='.') continue;
-        str.push_back(vec[i] - '0');
-    }
-    return str;
-}
-
-int len_fract(std::string vec){
-    int t_ans = 0;
-    int ans = 0;
-    for (int i = vec.size() - 1; i >= 0; i--) {
-        t_ans += 1;
-        if (vec[i] == '.') {
-            ans = t_ans - 1;
-            break;
-        }
-    }
-    return ans;
-}
-
-
-int find_sign(std::string s) {
-    if (s.size() == 0) return 1;
-    if (s[0] == '-') return -1;
-    return 1;
-}
-
-void reduce(std::vector<int> & num, int tail) {
-
-    while (num.size() > tail + 1 && num.back() == 0) {
-        num.pop_back();
-    }
-    return;
-}
-
-
-int ind_first_num(std::vector<int> num) {
-
-    int ans = 0;
-    int t_ans = 0;
-    for (int i = num.size() - 1; i >= 0; i--) {
-        t_ans += 1;
-        if (num[i] != 0) {
-            ans = t_ans;
-            break;
-        }
-    }
-    return ans;
-}
 
 class LongNum {
  public:
-    LongNum(std::string longnum) {
-        sign_ = find_sign(longnum);
-        long_num_ = to_vector(longnum);
-        fract_length_ = len_fract(longnum);
+    explicit LongNum(std::string longnum) {
+        sign_ = this -> find_sign(longnum);
+        long_num_ = this -> to_vector(longnum);
+        fract_length_ = this -> len_fract(longnum);
+        this -> reduce_head();
+        this -> reduce_tail();
+    }
+    int find_sign(std::string s) {
+        if (s.size() == 0) return 1;
+        if (s[0] == '-') return -1;
+        return 1;
     }
     LongNum() {
         sign_ = 1;
         fract_length_ = 0;
         long_num_.push_back(0);
     }
-    LongNum(std::vector<int> longnum, int len, int sign) {
+
+    explicit LongNum(std::vector<int> longnum, int len, int sign) {
         sign_ = sign;
         long_num_ = longnum;
         fract_length_ = len;
-    }
-
-    ~LongNum() {
-        long_num_.clear();
+        this -> reduce_head();
+        this -> reduce_tail();
     }
 
     std::string getLongNum() {
         if (sign_ == -1){
-            return '-' + to_string(long_num_, fract_length_);
+            return '-' + this -> to_string();
         }
 
-        return to_string(long_num_, fract_length_);
+        return to_string();
     };
-
-    int getLength() {
-        return fract_length_;
-    }
-    int getSign() {
-        return sign_;
-    }
 
     void setSign(int new_sign) {
         sign_ = new_sign;
     }
+
     void changeSign(int coeff) {
         sign_ *= coeff;
     }
 
-    friend LongNum Sum(LongNum first, LongNum second) {
-        int dif = abs(first.fract_length_ - second.fract_length_);
+    std::string to_string() const {
+        std::string str;
+        for (int i = long_num_.size() - 1; i >=0; i--) {
+            if (fract_length_ == i + 1) {
+                str.push_back('.');
+            }
+            str.push_back('0' + long_num_[i]);
+
+        }
+        return str;
+    }
+
+    std::vector<int> to_vector(std::string num)  {
+        std::vector<int> str;
+
+        int last_ind = 0;
+        if (num[0] == '-') {
+            last_ind = 1;
+        }
+
+        for (int i = num.size() - 1; i >= last_ind; i--) {
+            if (num[i] =='.') continue;
+            str.push_back(num[i] - '0');
+        }
+        return str;
+    }
+
+    int len_fract(std::string num) {
+        int t_ans = 0;
+        int ans = 0;
+        for (int i = num.size() - 1; i >= 0; i--) {
+            t_ans += 1;
+            if (num[i] == '.') {
+                ans = t_ans - 1;
+                break;
+            }
+        }
+        return ans;
+    }
+
+    void Round(int cnt) {
+        if (cnt < 0) return;
+        if (fract_length_ <= cnt) return;
+        std::reverse(long_num_.begin(), long_num_.end());
+        while (fract_length_ > cnt) {
+            long_num_.pop_back();
+            fract_length_ -= 1;
+        }
+        std::reverse(long_num_.begin(), long_num_.end());
+        return;
+    }
+
+    void reduce_head() {
+
+        while (long_num_.size() > 0 && long_num_.back() == 0) {
+            if (long_num_.size() == fract_length_ + 1) break;
+            long_num_.pop_back();
+        }
+        return;
+    }
+
+    void reduce_tail() {
+        std::reverse(long_num_.begin(), long_num_.end());
+        int cur = 0;
+        while (long_num_.size() > 0 && long_num_.back() == 0) {
+            if (cur == fract_length_) break;
+            long_num_.pop_back();
+            cur += 1;
+        }
+        fract_length_ -= cur;
+        std::reverse(long_num_.begin(), long_num_.end());
+        return;
+    }
+
+    int ind_first_num() const {
+
+        int ans = 0;
+        int t_ans = 0;
+        for (int i = long_num_.size() - 1; i >= 0; i--) {
+            t_ans += 1;
+            if (long_num_[i] != 0) {
+                ans = t_ans;
+                break;
+            }
+        }
+        return ans;
+    }
+    LongNum Sum(const LongNum& second) const {
+        int dif = abs(fract_length_ - second.fract_length_);
         int max_len;
 
         std::vector<int> ans_num;
-        if (first.fract_length_ >= second.fract_length_) {
-            max_len = std::max(first.long_num_.size(), second.long_num_.size() + dif);
+        if (fract_length_ >= second.fract_length_) {
+            max_len = std::max(long_num_.size(), second.long_num_.size() + dif);
             for (int i = 0; i < max_len; i++) {
                 int cur = 0;
-                if (i < first.long_num_.size()) {
-                    cur += first.long_num_[i];
+                if (i < long_num_.size()) {
+                    cur += long_num_[i];
                 }
                 if (i - dif >= 0 && i - dif < second.long_num_.size()) {
                     cur += second.long_num_[i - dif];
@@ -136,11 +155,11 @@ class LongNum {
             }
 
         } else {
-            max_len = std::max(first.long_num_.size() + dif, second.long_num_.size());
+            max_len = std::max(long_num_.size() + dif, second.long_num_.size());
             for (int i = 0; i < max_len; i++) {
                 int cur = 0;
-                if (i - dif >= 0 && i - dif < first.long_num_.size()) {
-                    cur += first.long_num_[i - dif];
+                if (i - dif >= 0 && i - dif < long_num_.size()) {
+                    cur += long_num_[i - dif];
                 }
                 if (i < second.long_num_.size()) {
                     cur += second.long_num_[i];
@@ -161,21 +180,23 @@ class LongNum {
             }
         }
 
-        LongNum ans(ans_num, std::max(first.fract_length_, second.fract_length_), 1);
+        LongNum ans(ans_num, std::max(fract_length_, second.fract_length_), 1);
+        ans.reduce_head();
+        ans.reduce_tail();
         return ans;
     }
 
-    friend LongNum Dif(LongNum first, LongNum second) {
-        int dif = abs(first.fract_length_ - second.fract_length_);
+    LongNum Dif(const LongNum& second) const {
+        int dif = abs(fract_length_ - second.fract_length_);
         std::vector<int> ans_num;
         int max_len;
-        if (first.fract_length_ >= second.fract_length_) {
-            max_len = std::max(first.long_num_.size(), second.long_num_.size() + dif);
+        if (fract_length_ >= second.fract_length_) {
+            max_len = std::max(long_num_.size(), second.long_num_.size() + dif);
 
             for (int i = 0; i < max_len; i++) {
                 int cur = 0;
-                if (i < first.long_num_.size()) {
-                    cur += first.long_num_[i];
+                if (i < long_num_.size()) {
+                    cur += long_num_[i];
                 }
                 if (i - dif >= 0 && i - dif < second.long_num_.size()) {
                     cur -= second.long_num_[i - dif];
@@ -185,12 +206,12 @@ class LongNum {
 
 
         } else {
-            max_len = std::max(first.long_num_.size() + dif, second.long_num_.size());
+            max_len = std::max(long_num_.size() + dif, long_num_.size());
 
             for (int i = 0; i < max_len; i++) {
                 int cur = 0;
-                if (i - dif >= 0 && i - dif < first.long_num_.size()) {
-                    cur += first.long_num_[i - dif];
+                if (i - dif >= 0 && i - dif < long_num_.size()) {
+                    cur += long_num_[i - dif];
                 }
                 if (i < second.long_num_.size()) {
                     cur -= second.long_num_[i];
@@ -220,46 +241,140 @@ class LongNum {
             }
         }
 
-        reduce(ans_num, std::max(first.fract_length_, second.fract_length_));
+        LongNum ans(ans_num, std::max(fract_length_, second.fract_length_), sign);
 
-
-        LongNum ans(ans_num, std::max(first.fract_length_, second.fract_length_), sign);
+        ans.reduce_head();
+        ans.reduce_tail();
         return ans;
 
     }
 
-    friend LongNum operator+(const LongNum first, const LongNum second) {
+    LongNum Div(const LongNum& second, int count_symbols) const {
+
+        LongNum t_f = *this;
+        t_f.setSign(1);
+        LongNum nul("0");
+
+        if (second == nul) {
+            std::cout << "Error! Division by zero\n";
+            return *this;
+        }
+
+        std::vector<int> ans;
+        int st_sec = second.long_num_.size() - second.fract_length_ - second.ind_first_num();
+        int st_fir = long_num_.size() - fract_length_ - ind_first_num();
+        int dif = st_fir - st_sec;
+        int exp = dif < 0 ? abs(dif) - 1: 0;
+        int max_exp = count_symbols;//std::max(first.fract_length_, second.fract_length_);
+        for (int i = 0; i + dif < 0; i++) {
+            ans.push_back(0);
+        }
+        while (dif >= 0 || exp < max_exp) {
+            std::vector<int> div = second.long_num_;
+            int len = second.fract_length_;
+            if (dif > 0 && second.fract_length_ < dif) {
+                len = 0;
+                std::reverse(div.begin(), div.end());
+                int cnt = 0;
+                while (second.fract_length_ + cnt < dif) {
+                    cnt += 1;
+                    div.push_back(0);
+                }
+                std::reverse(div.begin(), div.end());
+            } else if (dif < 0 && second.long_num_.size() - second.fract_length_ <= -dif) {
+                len = second.fract_length_ - dif;
+                int cnt = 0;
+                while (second.long_num_.size() - second.fract_length_ + cnt <= -dif) {
+                    cnt += 1;
+                    div.push_back(0);
+                }
+            } else {
+                len = second.fract_length_ - dif;
+            }
+            ans.push_back(0);
+            LongNum t_s(div, len, 1);
+            t_s.reduce_head();
+
+            while ((t_f > t_s) || t_f == t_s) {
+
+                t_f = t_f - t_s;
+                ans[ans.size() - 1] += 1;
+            }
+            if (dif < 0) {
+                exp += 1;
+            }
+            dif -= 1;
+
+        }
+
+        std::reverse(ans.begin(), ans.end());
+        LongNum ans_num(ans, max_exp, sign_ * second.sign_);
+
+        ans_num.reduce_head();
+        ans_num.reduce_tail();
+
+        return ans_num;
+
+    }
+
+    friend LongNum operator+(const LongNum& first, const LongNum& second) {
         LongNum t_ans;
         if (first.sign_ == 1 && second.sign_ == 1) {
-            t_ans = Sum(second, first);
+            t_ans = second.Sum(first);
         } else if (first.sign_ == -1 && second.sign_ == -1) {
-            t_ans = Sum(first, second);
+            t_ans = first.Sum(second);
             t_ans.setSign(-1);
         } else if (first.sign_ == -1 && second.sign_ == 1) {
-            t_ans = Dif(second, first);
+            LongNum temp = first;
+            temp.setSign(1);
+            if (temp < second) {
+                t_ans = second.Dif(first);
+            } else {
+                t_ans = first.Dif(second);
+                t_ans.changeSign(-1);
+            }
 
         } else {
-            t_ans = Dif(first, second);
+            LongNum temp = second;
+            temp.setSign(1);
+            if (first < temp) {
+                t_ans = second.Dif(first);
+                t_ans.changeSign(-1);
+            } else {
+                t_ans = first.Dif(second);
+            }
         }
         return t_ans;
     };
-    friend LongNum operator-(const LongNum first, const LongNum second) {
+
+    friend LongNum operator-(const LongNum& first, const LongNum& second) {
         LongNum t_ans;
         if (first.sign_ == 1 && second.sign_ == 1) {
-            t_ans = Dif(first, second);
+            if (first > second) {
+                t_ans = first.Dif(second);
+            } else {
+                t_ans = second.Dif(first);
+                t_ans.changeSign(-1);
+            }
+
         } else if (first.sign_ == -1 && second.sign_ == -1) {
-            t_ans = Dif(second, first);
+            if (second > first) {
+                t_ans = second.Dif(first);
+            } else {
+                t_ans = first.Dif(second);
+                t_ans.changeSign(-1);
+            }
+
         } else if (first.sign_ == -1 && second.sign_ == 1) {
-            t_ans = Sum(first, second);
+            t_ans = first.Sum(second);
             t_ans.setSign(-1);
 
         } else {
-            t_ans = Sum(first, second);
+            t_ans = first.Sum(second);
         }
         return t_ans;
 
     }
-
     friend LongNum operator*(const LongNum first, const LongNum second) {
 
         std::vector<int> ans(first.long_num_.size() + second.long_num_.size());
@@ -298,126 +413,28 @@ class LongNum {
             }
 
         }
-
-        reduce(ans, first.fract_length_ + second.fract_length_);
-
         LongNum num(ans, first.fract_length_ + second.fract_length_, first.sign_ * second.sign_);
+
+        num.reduce_head();
+        num.reduce_tail();
+
         return num;
 
     }
     friend LongNum operator/(const LongNum first, const LongNum second) {
-        LongNum t_f = first;
 
-        t_f.setSign(1);
-        LongNum nul("0");
-
-        if (second == nul) {
-
-            std::cout << "Error! Division by zero\n";
-            return first;
-        }
-
-        std::vector<int> ans;
-        int st_sec = second.long_num_.size() - second.fract_length_ - ind_first_num(second.long_num_);
-        int st_fir = first.long_num_.size() - first.fract_length_ - ind_first_num(first.long_num_);
-        int dif = st_fir - st_sec;
-        int exp = dif < 0 ? abs(dif) - 1: 0;
-        int max_exp = std::max(first.fract_length_, second.fract_length_);
-        for (int i = 0; i + dif < 0; i++) {
-            ans.push_back(0);
-        }
-        while (dif >= 0 || exp < max_exp) {
-            std::vector<int> div = second.long_num_;
-            int len = second.fract_length_;
-            if (dif > 0 && second.fract_length_ < dif) {
-                len = 0;
-                std::reverse(div.begin(), div.end());
-                int cnt = 0;
-                while (second.fract_length_ + cnt < dif) {
-                    cnt += 1;
-                    div.push_back(0);
-                }
-                std::reverse(div.begin(), div.end());
-            } else if (dif < 0 && second.long_num_.size() - second.fract_length_ <= -dif) {
-                len = second.fract_length_ - dif;
-                int cnt = 0;
-                while (second.long_num_.size() - second.fract_length_ + cnt <= -dif) {
-                    cnt += 1;
-                    div.push_back(0);
-                }
-            } else {
-                len = second.fract_length_ - dif;
-            }
-            ans.push_back(0);
-            reduce(div, len);
-            LongNum t_s(div, len, 1);
-            while ((t_f > t_s) || t_f == t_s) {
-
-                t_f = t_f - t_s;
-                ans[ans.size() - 1] += 1;
-            }
-            if (dif < 0) {
-                exp += 1;
-            }
-            dif -= 1;
-
-        }
-
-        std::reverse(ans.begin(), ans.end());
-        reduce(ans, max_exp);
-
-        LongNum ans_num(ans, max_exp, first.sign_ * second.sign_);
-        return ans_num;
-
+        return first.Div(second, std::max(first.fract_length_, second.fract_length_));
     }
 
     friend bool operator==(const LongNum first, const LongNum second) {
-        if (first.long_num_.size() - first.fract_length_ != second.long_num_.size() - second.fract_length_) {
-            return false;
+        if (first.sign_ == first.sign_) {
+            return first.long_num_ == second.long_num_;
         }
-        bool ans = true;
-        bool is_null = true;
-        for (int i = first.long_num_.size() - 1,
-             j = second.long_num_.size() - 1;
-             i >= 0 && j >= 0; i--, j--) {
-
-            if (first.long_num_[i] != 0) {
-                is_null = false;
-            }
-            if (second.long_num_[j] != 0) {
-                is_null = false;
-            }
-            if (first.long_num_[i] != second.long_num_[j]) {
-                ans = false;
-                break;
-            }
-            if (i == 0) {
-                while (j > 0) {
-                    j -= 1;
-                    if (second.long_num_[j] != 0) {
-                        is_null = false;
-                    }
-                    if (second.long_num_[j] != 0) {
-                        ans = false;
-                        break;
-                    }
-                }
-            } else if (j == 0) {
-                 while (i > 0) {
-                    i -= 1;
-                    if (first.long_num_[i] != 0) {
-                        is_null = false;
-                    }
-                    if (first.long_num_[i] != 0) {
-                        ans = false;
-                        break;
-                    }
-                }
-            }
+        std::vector<int> nul = {0};
+        if (first.long_num_ == nul && first.long_num_ == nul) {
+            return true;
         }
-        if (is_null) return true;
-        if (first.sign_ != second.sign_) return false;
-        return ans;
+        return false;
     }
     friend bool operator!=(const LongNum first, const LongNum second) {
         return !(first == second);
@@ -469,11 +486,30 @@ class LongNum {
     std::vector<int> long_num_;
     int fract_length_;
     int sign_;
+
 };
 
 
  LongNum operator "" _LN(const char* str) {
         LongNum ans(str);
         return ans;
+}
+
+LongNum pi_calculation(int symbol_cmp){
+    LongNum ans("0.0");
+    LongNum coef("1");
+    LongNum j("0");
+    for (int i = 0; i < symbol_cmp + 2; i++) {
+        ans = ans + ((1_LN).Div(coef, symbol_cmp + 1)) *
+                    ((4_LN).Div(8_LN * j + 1_LN, symbol_cmp + 1) -
+                     (2_LN).Div(8_LN * j + 4_LN, symbol_cmp + 1) -
+                     (1_LN).Div(8_LN * j + 5_LN, symbol_cmp + 1) -
+                     (1_LN).Div(8_LN * j + 6_LN, symbol_cmp + 1));
+        j = j + 1_LN;
+        coef = coef * 16_LN;
+     }
+
+     ans.Round(symbol_cmp);
+     return ans;
 }
 #endif  LONGNUM_H_INCLUDED
