@@ -3,8 +3,6 @@
 #include<vector>
 #include<algorithm>
 
-
-
 class LongNum {
  public:
     explicit LongNum(std::string longnum) {
@@ -14,11 +12,7 @@ class LongNum {
         this -> reduce_head();
         this -> reduce_tail();
     }
-    int find_sign(std::string s) {
-        if (s.size() == 0) return 1;
-        if (s[0] == '-') return -1;
-        return 1;
-    }
+
     LongNum() {
         sign_ = 1;
         fract_length_ = 0;
@@ -31,6 +25,12 @@ class LongNum {
         fract_length_ = len;
         this -> reduce_head();
         this -> reduce_tail();
+    }
+
+    int find_sign(std::string s) {
+        if (s.size() == 0) return 1;
+        if (s[0] == '-') return -1;
+        return 1;
     }
 
     std::string getLongNum() {
@@ -56,19 +56,16 @@ class LongNum {
                 str.push_back('.');
             }
             str.push_back('0' + long_num_[i]);
-
         }
         return str;
     }
 
     std::vector<int> to_vector(std::string num)  {
         std::vector<int> str;
-
         int last_ind = 0;
         if (num[0] == '-') {
             last_ind = 1;
         }
-
         for (int i = num.size() - 1; i >= last_ind; i--) {
             if (num[i] =='.') continue;
             str.push_back(num[i] - '0');
@@ -102,7 +99,6 @@ class LongNum {
     }
 
     void reduce_head() {
-
         while (long_num_.size() > 0 && long_num_.back() == 0) {
             if (long_num_.size() == fract_length_ + 1) break;
             long_num_.pop_back();
@@ -124,7 +120,6 @@ class LongNum {
     }
 
     int ind_first_num() const {
-
         int ans = 0;
         int t_ans = 0;
         for (int i = long_num_.size() - 1; i >= 0; i--) {
@@ -136,6 +131,7 @@ class LongNum {
         }
         return ans;
     }
+
     LongNum Sum(const LongNum& second) const {
         int dif = abs(fract_length_ - second.fract_length_);
         int max_len;
@@ -203,8 +199,6 @@ class LongNum {
                 }
                 ans_num.push_back(cur);
             }
-
-
         } else {
             max_len = std::max(long_num_.size() + dif, long_num_.size());
 
@@ -218,7 +212,6 @@ class LongNum {
                 }
                 ans_num.push_back(cur);
             }
-
         }
         int last = ans_num.size();
         for (int i = ans_num.size() - 1; i >= 0; i--) {
@@ -227,7 +220,6 @@ class LongNum {
                 break;
             }
         }
-
         int sign = 1;
         for (int i = 0; i < ans_num.size(); i++) {
             if (ans_num[i] < 0) {
@@ -465,7 +457,6 @@ class LongNum {
                 break;
             }
             if (i == 0) {
-
                 ans = false;
                 while (j > 0) {
                     j -= 1;
@@ -478,7 +469,6 @@ class LongNum {
                 ans = false;
             }
         }
-
 
         if (first.sign_ < second.sign_) return true;
         return ans;
@@ -494,12 +484,12 @@ class LongNum {
 
 };
 
-
  LongNum operator "" _LN(const char* str) {
         LongNum ans(str);
         return ans;
 }
-
+// Функция рассчета числа пи с помощью формула суммы 
+// 1/16^i * (4 / (8i + 1) - 2 / (8i + 4) - 1 / (8i + 5) - (1 / (8i + 6)) 
 LongNum pi_calculation(int symbol_cmp){
     LongNum ans("0.0");
     LongNum coef("1");
