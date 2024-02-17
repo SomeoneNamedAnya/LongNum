@@ -1,10 +1,14 @@
 #include <iostream>
 #include "longnum.h"
-using namespace std;
+#include <ctime>
+using namespace LongNumLib;
 
 int main(){
-    LongNum a("5.0");
-    cout << a.GetLongNum() << endl;
-    cout << PiCalculation(6).GetLongNum() << endl;
+    clock_t start_time =  clock();
+    LongNum pi = PiCalculation(100);
+    clock_t end_time = clock();
+    double search_time = (double)(end_time - start_time) / CLOCKS_PER_SEC;
+    std::cout << search_time << std::endl;
+    std::cout << pi.GetLongNum() << std::endl;
     return 0;
 }
