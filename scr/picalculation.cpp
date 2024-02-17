@@ -1,8 +1,8 @@
 #include "longnum.h"
 namespace LongNumLib {
     // Функция рассчета числа пи с помощью формула суммы 
-    // 1/16^i * (4 / (8i + 1) - 2 / (8i + 4) - 1 / (8i + 5) - (1 / (8i + 6)) 
-    LongNum PiCalculation(int symbol_cmp){
+    // 1 / 16^i * (4 / (8i + 1) - 2 / (8i + 4) - 1 / (8i + 5) - (1 / (8i + 6)) 
+    LongNum PiCalculation(int symbol_cmp) {
         LongNum ans("0.0");
         LongNum coef("1");
         LongNum j("0");
