@@ -360,5 +360,5 @@ TEST(PiCalculationTest, More) {
   EXPECT_EQ(first.GetLongNum(), ans) << first.GetLongNum() << " " << ans;
 
   EXPECT_ANY_THROW(PiCalculation(-1));
-
+  
 }
