@@ -48,11 +48,11 @@ namespace LongNumLib {
     
         std::string ToString() const;
     
-        std::vector<int> ToVector(std::string& num);
+        std::vector<int> ToVector(const std::string& num);
     
-        int LenFract(std::string& num);
+        int LenFract(const std::string& num);
     
-        int FindSign(std::string& s);
+        int FindSign(const std::string& s);
 
   };
 
