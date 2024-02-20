@@ -345,3 +345,20 @@ TEST(LogicOperationTest, Less) {
   EXPECT_EQ(first < second, ans) << first.GetLongNum() << " " << second.GetLongNum();
 
 }
+
+TEST(PiCalculationTest, More) {
+  LongNum first = PiCalculation(100);
+  std::string ans = "3.1415926535897932384626433832795028841971693993751058209749445923078164062862089986280348253421170679";
+  EXPECT_EQ(first.GetLongNum(), ans) << first.GetLongNum() << " " << ans;
+
+  first = PiCalculation(1);
+  ans = "3.1";
+  EXPECT_EQ(first.GetLongNum(), ans) << first.GetLongNum() << " " << ans;
+
+  first = PiCalculation(0);
+  ans = "3";
+  EXPECT_EQ(first.GetLongNum(), ans) << first.GetLongNum() << " " << ans;
+
+  EXPECT_ANY_THROW(PiCalculation(-1));
+
+}
