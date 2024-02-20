@@ -22,7 +22,7 @@ namespace LongNumLib {
         this -> ReduceTail();
     }
 
-    int LongNum::FindSign(std::string& s) {
+    int LongNum::FindSign(const std::string& s) {
         if (s.size() == 0) return 1;
         if (s[0] == '-') return -1;
         return 1;
@@ -61,7 +61,7 @@ namespace LongNumLib {
         return str;
     }
 
-    std::vector<int> LongNum::ToVector(std::string& num)  {
+    std::vector<int> LongNum::ToVector(const std::string& num)  {
         std::vector<int> str;
         int last_ind = 0;
         if (num[0] == '-') {
@@ -74,7 +74,7 @@ namespace LongNumLib {
         return str;
     }
 
-    int LongNum::LenFract(std::string& num) {
+    int LongNum::LenFract(const std::string& num) {
         int t_ans = 0;
         int ans = 0;
         for (int i = num.size() - 1; i >= 0; i--) {
@@ -393,7 +393,6 @@ namespace LongNumLib {
 
         if (f_start == -1 || s_start == -1) {
             ans.resize(first.fract_length_ + second.fract_length_ + 1);
-
         } else {
 
             for (int i = f_start; i < first.long_num_.size(); i++) {
